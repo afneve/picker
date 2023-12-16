@@ -1,6 +1,10 @@
 import "./styles/globals.scss";
 
 import React, { useState, useEffect, useRef } from "react";
+import { pickRandomEmoticonSubCategory } from "./emojis";
+
+import Add from "./components/Add";
+import Picker from "./components/Picker";
 
 const names = [
     "Test",
@@ -24,17 +28,17 @@ const shuffleArray = (array) => {
 };
 
 const finalArray = names.filter((name) => {
-    console.log(name);
-    console.log(lastSelect);
-    console.log(name === lastSelect);
     return name !== lastSelect;
 });
 
-console.log(finalArray);
-
 shuffleArray(finalArray);
 
+const emoticonLibraryArray = pickRandomEmoticonSubCategory();
+
 const App = () => {
+    // State to manage the value
+    const [roster, setRoster] = useState([]);
+
     const handleKeyDown = (event) => {
         // Check if Ctrl key is pressed (event.ctrlKey) and the pressed key is 'a' (event.key === 'a')
         if ((event.ctrlKey || event.metaKey) && event.key === "a") {
@@ -43,123 +47,44 @@ const App = () => {
         }
     };
     const min = 500;
-    const max = 1500;
-
-    const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-
     const intervalMax = min; // randomNumber // 500;
 
-    // State to manage the value
-    const [storedValue, setStoredValue] = useState("");
+    // Key for local storage
+    const storageKey = "testArray";
 
-    // Key to identify the value in local storage
-    const storageKey = "myStoredValue";
-
-    // Function to set a value in local storage
-    const setLocalStorageValue = (value) => {
-        localStorage.setItem(storageKey, value);
-        setStoredValue(value);
+    // Function to set the array in local storage and update state
+    const setLocalStorageArray = (array) => {
+        localStorage.setItem(storageKey, JSON.stringify(array));
+        setRoster(array);
     };
 
-    // Function to get a value from local storage
-    const getLocalStorageValue = () => {
-        const storedValue = localStorage.getItem(storageKey);
-        setStoredValue(storedValue || ""); // Set the state with the stored value or an empty string
+    // Function to get the array from local storage
+    const getLocalStorageArray = () => {
+        const storedArray = localStorage.getItem(storageKey);
+        setRoster(JSON.parse(storedArray) || []); // Set the state with the stored array or an empty array
     };
 
     // Use useEffect to load the value from local storage when the component mounts
     useEffect(() => {
-        setLocalStorageValue("test");
-        getLocalStorageValue();
+        setLocalStorageArray(["Test", "Test2"]);
+        getLocalStorageArray();
     }, []);
 
+    console.log("RENDER APP");
+
     return (
-        <div onKeyDown={handleKeyDown} className="flex-container">
-            <Select intervalMax={intervalMax} />
+        <div className="flex-container">
+            {roster?.length ? (
+                <Picker
+                    intervalMax={intervalMax}
+                    roster={finalArray}
+                    emoticonLibraryArray={emoticonLibraryArray}
+                />
+            ) : (
+                <Add />
+            )}
         </div>
     );
-};
-
-const Select = ({ intervalMax }) => {
-    const [selectedIndex, setSelectedIndex] = useState(null);
-    const intervalIdRef = useRef(null);
-    const intervalDurationRef = useRef(10); // Initial interval duration in milliseconds
-    const runIntervalRef = useRef(true); // Initial interval duration in milliseconds
-    const divCount = finalArray.length;
-    console.log(finalArray.length);
-
-    console.log("IntervalMax: ", intervalMax);
-
-    useEffect(() => {
-        const handleInterval = () => {
-            if (runIntervalRef.current === false) {
-                return;
-            }
-            // Clear the selected class for the previous index
-            if (selectedIndex !== null) {
-                document
-                    .getElementById(`div-${selectedIndex}`)
-                    .classList.remove("selected");
-            }
-
-            // Generate a random index for the next div
-            const newIndex = Math.floor(Math.random() * divCount);
-
-            // Animate selected boxes in order
-            // let newIndex = selectedIndex + 1;
-            // newIndex = newIndex > divCount - 1 ? 0 : newIndex
-
-            // Add the selected class to the new index
-            document
-                .getElementById(`div-${newIndex}`)
-                .classList.add("selected");
-
-            // Update the selected index in the state
-            setSelectedIndex(newIndex);
-
-            // Check if the total time has reached 1 second (1000 milliseconds)
-            console.log("Interval: ", intervalDurationRef.current);
-            if (
-                intervalDurationRef.current < intervalMax &&
-                runIntervalRef.current
-            ) {
-                // Update the interval duration dynamically
-                intervalDurationRef.current *= 1.2;
-            } else {
-                // Stop the interval when 1 second is reached
-                runIntervalRef.current = false;
-                clearInterval(intervalIdRef.current);
-                console.log(selectedIndex);
-            }
-        };
-
-        // Start the initial interval
-        intervalIdRef.current = setInterval(
-            handleInterval,
-            intervalDurationRef.current
-        );
-
-        // Clean up interval when the component unmounts
-        return () => {
-            if (intervalIdRef.current) {
-                clearInterval(intervalIdRef.current);
-            }
-        };
-    }, [selectedIndex, divCount, intervalMax]);
-
-    // Render the 9 divs
-    const divs = Array.from({ length: divCount }, (_, index) => (
-        <div
-            contentEditable="true"
-            key={index}
-            id={`div-${index}`}
-            className={`box ${index === selectedIndex ? "selected" : ""}`}
-        >
-            {finalArray[index]}{" "}
-        </div>
-    ));
-
-    return <div className="container">{divs}</div>;
 };
 
 export default App;

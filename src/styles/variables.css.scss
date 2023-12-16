@@ -3,12 +3,13 @@ $ice_dark_blue: #3E4756;
 $ice_yellow: #fce037;
 $ice_green: #26bf42;
 
-html, body {
+html,
+body {
     background-color: black;
 }
 
 .flex-container {
-        display: flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -17,32 +18,60 @@ html, body {
 }
 
 .container {
-    // display: flex;
-    // justify-content: space-between;
-    // align-items: center;
-    // height: 100vh;
-    // padding: 20px;
-    // box-sizing: border-box;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
-    gap: 10px; /* Adjust the gap as needed */
-  }
-  
-  .box {
-    width: 100px;
-    height: 100px;
-    border: 1px solid #ccc;
-    margin: 5px;
-    transition: transform 0.1s ease; /* Add a transition for the transform property */
-    display:flex;
+    display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .selected {
-    background-color: #0066cc;
-    transform: scale(1.3); /* Apply a slight scale when the "selected" class is present */
-  }
+    flex-wrap: wrap;
+    width: 500px;
+    padding: 20px;
+    box-sizing: border-box;
+    // display: grid;
+    // grid-template-columns: repeat(3, 1fr);
+    // /* Three columns with equal width */
+    // gap: 10px;
+    /* Adjust the gap as needed */
+}
+
+.box {
+    width: 100px;
+    height: 75px;
+    // border: 1px solid #ccc;
+    margin: 5px;
+    transition: transform 0.1s ease;
+    /* Add a transition for the transform property */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: row wrap
+}
+
+.box div {
+    flex: 1 1 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    transition: transform 0.1s ease;
+}
+
+.done .box {
+    transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+.done .box.selected {
+    //transform: translate(calc(50vw - 50px), calc(50vh - 50px));
+    transform: scale(3.0);
+}
+
+.done .box:not(.selected) {
+    opacity: 0;
+}
+
+.selected {
+    //background-color: #0066cc;
+    transform: scale(1.8);
+    /* Apply a slight scale when the "selected" class is present */
+}
 
 @mixin for-phone-only {
     @media (max-width: 599px) {
@@ -75,7 +104,7 @@ html, body {
 }
 
 body {
-    background: #black;
+    background: black;
     color: #666;
     font-family: 'Oxygen', Arial, sans-serif;
     margin: 0;
